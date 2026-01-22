@@ -36,6 +36,9 @@ fi
 
 echo "Converting: src/${SLIDE_NAME}/slides.md -> slides/${SLIDE_NAME}.pdf"
 
+# Remove existing PDF to avoid permission issues on overwrite
+rm -f "${OUTPUT_DIR}/${SLIDE_NAME}.pdf"
+
 podman run --rm \
     --security-opt label=disable \
     -v "${SRC_SLIDE_DIR}:/src:ro" \
@@ -46,5 +49,8 @@ podman run --rm \
     --allow-local-files \
     "slides.md" \
     -o "/out/${SLIDE_NAME}.pdf"
+
+# Fix ownership to current user
+podman unshare chown 0:0 "${OUTPUT_DIR}/${SLIDE_NAME}.pdf"
 
 echo "Done! PDF generated: ${OUTPUT_DIR}/${SLIDE_NAME}.pdf"
