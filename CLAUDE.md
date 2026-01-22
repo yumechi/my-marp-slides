@@ -12,18 +12,21 @@ Marp CLI と Podman を使用して Markdown から PDF スライドを生成す
 | `CLAUDE.md` | このファイル（プロジェクト構成情報） |
 | `build.sh` | Podman を使った PDF 生成スクリプト |
 | `.gitignore` | Git 除外設定 |
-| `slides/` | スライド出力ディレクトリ（内容は Git 管理対象外） |
+| `src/` | Markdown ソースディレクトリ（Git 管理対象） |
+| `slides/` | PDF 出力ディレクトリ（Git 管理対象外） |
 
 ## ディレクトリ構造
 
 ```
+src/
+└── {slide-name}/
+    └── slides.md      # ソースファイル（固定名）
+
 slides/
-└── {slide-name}/      # 各スライド用ディレクトリ (777)
-    ├── slides.md      # ソースファイル（固定名）
-    └── {slide-name}.pdf  # 生成される PDF
+└── {slide-name}.pdf   # 生成される PDF
 ```
 
 ## 注意事項
 
-- `slides/` 配下の `*.md` と `*.pdf` は Git 管理対象外
-- 新規ディレクトリ作成時はパーミッション 777 を設定
+- `slides/*.pdf` は Git 管理対象外
+- `src/` 配下の Markdown ファイルは Git 管理対象

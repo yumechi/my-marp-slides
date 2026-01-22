@@ -3,7 +3,8 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SLIDES_DIR="${SCRIPT_DIR}/slides"
+SRC_DIR="${SCRIPT_DIR}/src"
+OUTPUT_DIR="${SCRIPT_DIR}/slides"
 IMAGE_NAME="docker.io/marpteam/marp-cli:latest"
 
 if [ -z "$1" ]; then
@@ -11,7 +12,7 @@ if [ -z "$1" ]; then
     echo "Example: $0 sample"
     echo ""
     echo "Available slides:"
-    for dir in "${SLIDES_DIR}"/*/; do
+    for dir in "${SRC_DIR}"/*/; do
         if [ -d "$dir" ] && [ -f "${dir}slides.md" ]; then
             echo "  - $(basename "$dir")"
         fi
@@ -20,29 +21,30 @@ if [ -z "$1" ]; then
 fi
 
 SLIDE_NAME="$1"
-SLIDE_DIR="${SLIDES_DIR}/${SLIDE_NAME}"
-MD_FILE="${SLIDE_DIR}/slides.md"
+SRC_SLIDE_DIR="${SRC_DIR}/${SLIDE_NAME}"
+MD_FILE="${SRC_SLIDE_DIR}/slides.md"
 
-if [ ! -d "$SLIDE_DIR" ]; then
-    echo "Error: Directory not found: ${SLIDE_DIR}"
+if [ ! -d "$SRC_SLIDE_DIR" ]; then
+    echo "Error: Directory not found: ${SRC_SLIDE_DIR}"
     exit 1
 fi
 
 if [ ! -f "$MD_FILE" ]; then
-    echo "Error: slides.md not found in ${SLIDE_DIR}"
+    echo "Error: slides.md not found in ${SRC_SLIDE_DIR}"
     exit 1
 fi
 
-echo "Converting: ${SLIDE_NAME}/slides.md -> ${SLIDE_NAME}/${SLIDE_NAME}.pdf"
+echo "Converting: src/${SLIDE_NAME}/slides.md -> slides/${SLIDE_NAME}.pdf"
 
 podman run --rm \
     --security-opt label=disable \
-    -v "${SLIDE_DIR}:/work" \
-    -w /work \
+    -v "${SRC_SLIDE_DIR}:/src:ro" \
+    -v "${OUTPUT_DIR}:/out" \
+    -w /src \
     "${IMAGE_NAME}" \
     --pdf \
     --allow-local-files \
     "slides.md" \
-    -o "${SLIDE_NAME}.pdf"
+    -o "/out/${SLIDE_NAME}.pdf"
 
-echo "Done! PDF generated: ${SLIDE_DIR}/${SLIDE_NAME}.pdf"
+echo "Done! PDF generated: ${OUTPUT_DIR}/${SLIDE_NAME}.pdf"
