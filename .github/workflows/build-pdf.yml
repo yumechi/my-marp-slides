@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.branch }}
 
@@ -84,7 +84,7 @@ jobs:
           sudo chown $USER:$USER "slides/${SLIDE_NAME}.pdf"
 
       - name: Upload PDF artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ inputs.slide_name }}-pdf
           path: slides/${{ inputs.slide_name }}.pdf
