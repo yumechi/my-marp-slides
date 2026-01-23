@@ -35,6 +35,7 @@ jobs:
       - name: Create output directory
         run: |
           mkdir -p slides
+          chmod 777 slides
 
       - name: Build PDF
         run: |
@@ -68,8 +69,9 @@ jobs:
           # Build PDF
           podman run --rm \
             --security-opt label=disable \
+            --user root \
             -v "$(pwd)/${SRC_SLIDE_DIR}:/src:ro" \
-            -v "$(pwd)/slides:/out" \
+            -v "$(pwd)/slides:/out:rw" \
             -w /src \
             marp-slides-jp:latest \
             ${THEME_OPT} \
@@ -78,8 +80,8 @@ jobs:
             "slides.md" \
             -o "/out/${SLIDE_NAME}.pdf"
           
-          # Fix ownership
-          podman unshare chown 0:0 "slides/${SLIDE_NAME}.pdf"
+          # Fix ownership to runner user
+          sudo chown $USER:$USER "slides/${SLIDE_NAME}.pdf"
 
       - name: Upload PDF artifact
         uses: actions/upload-artifact@v4
