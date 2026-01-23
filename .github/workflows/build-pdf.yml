@@ -1,0 +1,89 @@
+name: Build PDF Slides
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch name to checkout'
+        required: true
+        default: 'main'
+        type: string
+      slide_name:
+        description: 'Slide directory name (e.g., sample, 20260123)'
+        required: true
+        default: 'sample'
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+
+      - name: Install Podman
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y podman
+
+      - name: Build custom Marp image
+        run: |
+          podman build -t marp-slides-jp:latest -f Containerfile .
+
+      - name: Create output directory
+        run: |
+          mkdir -p slides
+
+      - name: Build PDF
+        run: |
+          SLIDE_NAME="${{ inputs.slide_name }}"
+          SRC_SLIDE_DIR="src/${SLIDE_NAME}"
+          MD_FILE="${SRC_SLIDE_DIR}/slides.md"
+          
+          # Validate slide directory and file
+          if [ ! -d "$SRC_SLIDE_DIR" ]; then
+            echo "Error: Directory not found: ${SRC_SLIDE_DIR}"
+            exit 1
+          fi
+          
+          if [ ! -f "$MD_FILE" ]; then
+            echo "Error: slides.md not found in ${SRC_SLIDE_DIR}"
+            exit 1
+          fi
+          
+          # Check for custom.css
+          THEME_OPT=""
+          CUSTOM_CSS_HOST_PATH="${SRC_SLIDE_DIR}/assets/custom.css"
+          CUSTOM_CSS_CONTAINER_PATH="/src/assets/custom.css"
+          if grep -qE '(^|[^A-Za-z0-9_./-])(assets/custom\.css|/src/assets/custom\.css)([^A-Za-z0-9_./-]|$)' "${MD_FILE}"; then
+            if [ ! -f "${CUSTOM_CSS_HOST_PATH}" ]; then
+              echo "Error: ${CUSTOM_CSS_HOST_PATH} is referenced in slides.md but not found."
+              exit 1
+            fi
+            THEME_OPT="--theme-set ${CUSTOM_CSS_CONTAINER_PATH}"
+          fi
+          
+          # Build PDF
+          podman run --rm \
+            --security-opt label=disable \
+            -v "$(pwd)/${SRC_SLIDE_DIR}:/src:ro" \
+            -v "$(pwd)/slides:/out" \
+            -w /src \
+            marp-slides-jp:latest \
+            ${THEME_OPT} \
+            --pdf \
+            --allow-local-files \
+            "slides.md" \
+            -o "/out/${SLIDE_NAME}.pdf"
+          
+          # Fix ownership
+          podman unshare chown 0:0 "slides/${SLIDE_NAME}.pdf"
+
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.slide_name }}-pdf
+          path: slides/${{ inputs.slide_name }}.pdf
+          retention-days: 1
