@@ -9,10 +9,13 @@ on:
         default: 'main'
         type: string
       slide_name:
-        description: 'Slide directory name (e.g., sample, 20260123)'
+        description: 'Slide directory name'
         required: true
         default: 'sample'
-        type: string
+        type: choice
+        options:
+          - sample
+          - 20260123
 
 jobs:
   build:
