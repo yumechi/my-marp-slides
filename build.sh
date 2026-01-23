@@ -7,47 +7,59 @@ SRC_DIR="${SCRIPT_DIR}/src"
 OUTPUT_DIR="${SCRIPT_DIR}/slides"
 IMAGE_NAME="marp-slides-jp"
 CUSTOM_CSS_NAME="custom.css"
+IMAGE_REF="${IMAGE_NAME}:latest"
 
-# Build custom image if not exists or Containerfile is newer
-# Note: This function assumes Ubuntu (Linux) environment
+# Build custom image only when:
+# - the image doesn't exist, OR
+# - the user explicitly requests build with --build / -b
 build_image() {
-    if ! podman image exists "${IMAGE_NAME}"; then
+    local force_build="${1:-0}"
+
+    if ! podman image exists "${IMAGE_REF}"; then
+        force_build=1
+    fi
+
+    if [ "${force_build}" -eq 1 ]; then
         echo "Building custom Marp image with Japanese fonts..."
         podman build -t "${IMAGE_NAME}" -f "${SCRIPT_DIR}/Containerfile" "${SCRIPT_DIR}"
-        return
-    fi
-    
-    # Check if Containerfile is newer than the image
-    # Get Containerfile modification time (Unix timestamp)
-    local containerfile_mtime
-    containerfile_mtime=$(stat -c %Y "${SCRIPT_DIR}/Containerfile" 2>/dev/null)
-    
-    if [ -z "$containerfile_mtime" ]; then
-        echo "Cannot determine Containerfile modification time. Rebuilding..."
-        podman build -t "${IMAGE_NAME}" -f "${SCRIPT_DIR}/Containerfile" "${SCRIPT_DIR}"
-        return
-    fi
-    
-    # Get image creation time as Unix timestamp directly
-    local image_unix_timestamp
-    image_unix_timestamp=$(podman image inspect "${IMAGE_NAME}" --format '{{.Created.Unix}}' 2>/dev/null)
-    
-    if [ -z "$image_unix_timestamp" ]; then
-        echo "Cannot determine image creation time. Rebuilding..."
-        podman build -t "${IMAGE_NAME}" -f "${SCRIPT_DIR}/Containerfile" "${SCRIPT_DIR}"
-        return
-    fi
-    
-    if [ "$containerfile_mtime" -gt "$image_unix_timestamp" ]; then
-        echo "Containerfile is newer than image. Rebuilding..."
-        podman build -t "${IMAGE_NAME}" -f "${SCRIPT_DIR}/Containerfile" "${SCRIPT_DIR}"
     else
-        echo "Using existing image: ${IMAGE_NAME} (Containerfile unchanged)"
+        echo "Using existing image: ${IMAGE_REF} (--build to rebuild)"
     fi
 }
 
-if [ -z "$1" ]; then
-    echo "Usage: $0 <slide-name>"
+FORCE_BUILD=0
+SLIDE_NAME=""
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -b|--build)
+            FORCE_BUILD=1
+            shift
+            ;;
+        -h|--help)
+            echo "Usage: $0 [--build|-b] <slide-name>"
+            echo "Example: $0 sample"
+            echo "Example (force build): $0 --build sample"
+            echo ""
+            echo "Options:"
+            echo "  -b, --build   Force podman build of the image"
+            echo "  -h, --help    Show this help"
+            exit 0
+            ;;
+        -*)
+            echo "Error: Unknown option: $1"
+            echo "Usage: $0 [--build|-b] <slide-name>"
+            exit 1
+            ;;
+        *)
+            SLIDE_NAME="$1"
+            shift
+            ;;
+    esac
+done
+
+if [ -z "${SLIDE_NAME}" ]; then
+    echo "Usage: $0 [--build|-b] <slide-name>"
     echo "Example: $0 sample"
     echo ""
     echo "Available slides:"
@@ -59,7 +71,6 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-SLIDE_NAME="$1"
 SRC_SLIDE_DIR="${SRC_DIR}/${SLIDE_NAME}"
 MD_FILE="${SRC_SLIDE_DIR}/slides.md"
 
@@ -74,7 +85,7 @@ if [ ! -f "$MD_FILE" ]; then
 fi
 
 # Build custom image
-build_image
+build_image "${FORCE_BUILD}"
 
 echo "Converting: src/${SLIDE_NAME}/slides.md -> slides/${SLIDE_NAME}.pdf"
 
@@ -99,7 +110,7 @@ podman run --rm \
     -v "${SRC_SLIDE_DIR}:/src:ro" \
     -v "${OUTPUT_DIR}:/out" \
     -w /src \
-    "${IMAGE_NAME}" \
+    "${IMAGE_REF}" \
     ${THEME_OPT} \
     --pdf \
     --allow-local-files \
