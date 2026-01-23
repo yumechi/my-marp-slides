@@ -1,11 +1,37 @@
-/* Import Source Han Sans (源ノ角ゴシック) via Google Fonts Early Access */
-@import url('https://fonts.googleapis.com/earlyaccess/notosansjapanese.css');
+/* @theme custom-gaia */
 
-section {
-  font-family: 'Noto Sans Japanese', 'Source Han Sans', sans-serif;
+@import "gaia";
+
+/* Noto Sans CJK JP (源ノ角ゴシック相当) - installed in container */
+
+/* :root is recommended for higher CSS specificity in Marp */
+:root {
+  font-family: 'Noto Sans CJK JP', 'Noto Sans JP', sans-serif;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Noto Sans Japanese', 'Source Han Sans', sans-serif;
+section {
+  font-family: 'Noto Sans CJK JP', 'Noto Sans JP', sans-serif;
+}
+
+section h1,
+section h2,
+section h3,
+section h4,
+section h5,
+section h6 {
+  font-family: 'Noto Sans CJK JP', 'Noto Sans JP', sans-serif;
   font-weight: 700;
+}
+
+section ul,
+section ol {
+  line-height: 1.25;
+}
+
+section li {
+  line-height: 1.25;
+}
+
+section code {
+  font-family: 'Noto Sans Mono CJK JP', monospace;
 }

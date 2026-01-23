@@ -5,7 +5,16 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SRC_DIR="${SCRIPT_DIR}/src"
 OUTPUT_DIR="${SCRIPT_DIR}/slides"
-IMAGE_NAME="docker.io/marpteam/marp-cli:latest"
+IMAGE_NAME="marp-slides-jp"
+
+# Build custom image if not exists or Containerfile is newer
+build_image() {
+    if ! podman image exists "${IMAGE_NAME}" || \
+       [ "${SCRIPT_DIR}/Containerfile" -nt "$(podman image inspect "${IMAGE_NAME}" --format '{{.Created}}' 2>/dev/null || echo 0)" ]; then
+        echo "Building custom Marp image with Japanese fonts..."
+        podman build -t "${IMAGE_NAME}" -f "${SCRIPT_DIR}/Containerfile" "${SCRIPT_DIR}"
+    fi
+}
 
 if [ -z "$1" ]; then
     echo "Usage: $0 <slide-name>"
@@ -34,10 +43,19 @@ if [ ! -f "$MD_FILE" ]; then
     exit 1
 fi
 
+# Build custom image
+build_image
+
 echo "Converting: src/${SLIDE_NAME}/slides.md -> slides/${SLIDE_NAME}.pdf"
 
 # Remove existing PDF to avoid permission issues on overwrite
 rm -f "${OUTPUT_DIR}/${SLIDE_NAME}.pdf"
+
+# Build theme-set option if custom.css exists
+THEME_OPT=""
+if [ -f "${SRC_SLIDE_DIR}/assets/custom.css" ]; then
+    THEME_OPT="--theme-set /src/assets/custom.css"
+fi
 
 podman run --rm \
     --security-opt label=disable \
@@ -45,6 +63,7 @@ podman run --rm \
     -v "${OUTPUT_DIR}:/out" \
     -w /src \
     "${IMAGE_NAME}" \
+    ${THEME_OPT} \
     --pdf \
     --allow-local-files \
     "slides.md" \

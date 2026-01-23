@@ -1,9 +1,7 @@
 ---
 marp: true
-theme: default
+theme: custom-gaia
 paginate: true
-style: |
-  @import 'assets/custom.css';
 ---
 
 # 2026年 エンジニアリング自己学習法
