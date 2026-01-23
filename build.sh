@@ -92,16 +92,13 @@ echo "Converting: src/${SLIDE_NAME}/slides.md -> slides/${SLIDE_NAME}.pdf"
 # Remove existing PDF to avoid permission issues on overwrite
 rm -f "${OUTPUT_DIR}/${SLIDE_NAME}.pdf"
 
-# Build theme-set option only when slides.md references custom.css.
+# Build theme-set option when custom.css exists.
 # (Keep custom.css filename fixed via CUSTOM_CSS_NAME.)
+# This handles both @import references and theme: custom-* usage.
 THEME_OPT=""
 CUSTOM_CSS_HOST_PATH="${SRC_SLIDE_DIR}/assets/${CUSTOM_CSS_NAME}"
 CUSTOM_CSS_CONTAINER_PATH="/src/assets/${CUSTOM_CSS_NAME}"
-if grep -qE '(^|[^A-Za-z0-9_./-])(assets/custom\.css|/src/assets/custom\.css)([^A-Za-z0-9_./-]|$)' "${MD_FILE}"; then
-    if [ ! -f "${CUSTOM_CSS_HOST_PATH}" ]; then
-        echo "Error: ${CUSTOM_CSS_HOST_PATH} is referenced in slides.md but not found."
-        exit 1
-    fi
+if [ -f "${CUSTOM_CSS_HOST_PATH}" ]; then
     THEME_OPT="--theme-set ${CUSTOM_CSS_CONTAINER_PATH}"
 fi
 
