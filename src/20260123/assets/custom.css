@@ -1,0 +1,11 @@
+/* Import Source Han Sans (源ノ角ゴシック) via Google Fonts Early Access */
+@import url('https://fonts.googleapis.com/earlyaccess/notosansjapanese.css');
+
+section {
+  font-family: 'Noto Sans Japanese', 'Source Han Sans', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Noto Sans Japanese', 'Source Han Sans', sans-serif;
+  font-weight: 700;
+}

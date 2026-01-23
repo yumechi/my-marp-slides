@@ -2,6 +2,8 @@
 marp: true
 theme: default
 paginate: true
+style: |
+  @import 'assets/custom.css';
 ---
 
 # 2026年 エンジニアリング自己学習法
@@ -96,3 +98,17 @@ paginate: true
 - AI によって学ぶことが非常に増えています、日々学び続けましょう
 - Python は何でもライブラリあります、何でも動くからまず試しましょう
 - AI は失敗もするので、仮想環境もぜひこの機会に覚えましょう
+
+---
+
+## ライセンス情報
+
+**源ノ角ゴシック (Source Han Sans)**
+- 開発: Adobe, Google
+- ライセンス: SIL Open Font License 1.1
+- https://github.com/adobe-fonts/source-han-sans
+
+**Marp (Markdown Presentation Ecosystem)**
+- 開発: Marp team
+- ライセンス: MIT License
+- https://github.com/marp-team/marp
