@@ -6,6 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SRC_DIR="${SCRIPT_DIR}/src"
 OUTPUT_DIR="${SCRIPT_DIR}/slides"
 IMAGE_NAME="marp-slides-jp"
+CUSTOM_CSS_NAME="custom.css"
 
 # Build custom image if not exists or Containerfile is newer
 # Note: This function assumes Ubuntu (Linux) environment
@@ -80,10 +81,17 @@ echo "Converting: src/${SLIDE_NAME}/slides.md -> slides/${SLIDE_NAME}.pdf"
 # Remove existing PDF to avoid permission issues on overwrite
 rm -f "${OUTPUT_DIR}/${SLIDE_NAME}.pdf"
 
-# Build theme-set option if custom.css exists
+# Build theme-set option only when slides.md references custom.css.
+# (Keep custom.css filename fixed via CUSTOM_CSS_NAME.)
 THEME_OPT=""
-if [ -f "${SRC_SLIDE_DIR}/assets/custom.css" ]; then
-    THEME_OPT="--theme-set /src/assets/custom.css"
+CUSTOM_CSS_HOST_PATH="${SRC_SLIDE_DIR}/assets/${CUSTOM_CSS_NAME}"
+CUSTOM_CSS_CONTAINER_PATH="/src/assets/${CUSTOM_CSS_NAME}"
+if grep -qE '(^|[^A-Za-z0-9_./-])(assets/custom\.css|/src/assets/custom\.css)([^A-Za-z0-9_./-]|$)' "${MD_FILE}"; then
+    if [ ! -f "${CUSTOM_CSS_HOST_PATH}" ]; then
+        echo "Error: ${CUSTOM_CSS_HOST_PATH} is referenced in slides.md but not found."
+        exit 1
+    fi
+    THEME_OPT="--theme-set ${CUSTOM_CSS_CONTAINER_PATH}"
 fi
 
 podman run --rm \
