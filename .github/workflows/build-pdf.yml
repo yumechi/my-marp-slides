@@ -46,6 +46,9 @@ jobs:
           SRC_SLIDE_DIR="src/${SLIDE_NAME}"
           MD_FILE="${SRC_SLIDE_DIR}/slides.md"
           
+          # Generate timestamp in yyyymmddhhmmss format
+          TIMESTAMP=$(date +%Y%m%d%H%M%S)
+          
           # Validate slide directory and file
           if [ ! -d "$SRC_SLIDE_DIR" ]; then
             echo "Error: Directory not found: ${SRC_SLIDE_DIR}"
@@ -66,7 +69,8 @@ jobs:
             THEME_OPT="--theme-set ${CUSTOM_CSS_CONTAINER_PATH}"
           fi
           
-          # Build PDF
+          # Build PDF with timestamp in filename
+          PDF_FILENAME="${SLIDE_NAME}-${TIMESTAMP}.pdf"
           podman run --rm \
             --security-opt label=disable \
             --user root \
@@ -78,14 +82,17 @@ jobs:
             --pdf \
             --allow-local-files \
             "slides.md" \
-            -o "/out/${SLIDE_NAME}.pdf"
+            -o "/out/${PDF_FILENAME}"
           
           # Fix ownership to runner user
-          sudo chown $USER:$USER "slides/${SLIDE_NAME}.pdf"
+          sudo chown $USER:$USER "slides/${PDF_FILENAME}"
+          
+          # Save filename for next step
+          echo "PDF_FILENAME=${PDF_FILENAME}" >> $GITHUB_ENV
 
       - name: Upload PDF artifact
         uses: actions/upload-artifact@v6
         with:
           name: ${{ inputs.slide_name }}-pdf
-          path: slides/${{ inputs.slide_name }}.pdf
+          path: slides/${{ env.PDF_FILENAME }}
           retention-days: 1
