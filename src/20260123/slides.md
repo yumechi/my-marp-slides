@@ -101,10 +101,10 @@ paginate: true
 
 ## ライセンス情報
 
-**源ノ角ゴシック (Source Han Sans)**
-- 開発: Adobe, Google
+**Noto Sans CJK JP**
+- 開発: Google
 - ライセンス: SIL Open Font License 1.1
-- https://github.com/adobe-fonts/source-han-sans
+- https://github.com/googlefonts/noto-cjk
 
 **Marp (Markdown Presentation Ecosystem)**
 - 開発: Marp team
