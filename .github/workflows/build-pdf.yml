@@ -48,6 +48,7 @@ jobs:
           
           # Generate timestamp in yyyymmddhhmmss format
           TIMESTAMP=$(date +%Y%m%d%H%M%S)
+          echo "TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
           
           # Validate slide directory and file
           if [ ! -d "$SRC_SLIDE_DIR" ]; then
@@ -93,6 +94,6 @@ jobs:
       - name: Upload PDF artifact
         uses: actions/upload-artifact@v6
         with:
-          name: ${{ inputs.slide_name }}-pdf
+          name: ${{ inputs.slide_name }}-pdf-${{ env.TIMESTAMP }}
           path: slides/${{ env.PDF_FILENAME }}
           retention-days: 1
