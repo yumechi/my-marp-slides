@@ -8,11 +8,40 @@ OUTPUT_DIR="${SCRIPT_DIR}/slides"
 IMAGE_NAME="marp-slides-jp"
 
 # Build custom image if not exists or Containerfile is newer
+# Note: This function assumes Ubuntu (Linux) environment
 build_image() {
-    if ! podman image exists "${IMAGE_NAME}" || \
-       [ "${SCRIPT_DIR}/Containerfile" -nt "$(podman image inspect "${IMAGE_NAME}" --format '{{.Created}}' 2>/dev/null || echo 0)" ]; then
+    if ! podman image exists "${IMAGE_NAME}"; then
         echo "Building custom Marp image with Japanese fonts..."
         podman build -t "${IMAGE_NAME}" -f "${SCRIPT_DIR}/Containerfile" "${SCRIPT_DIR}"
+        return
+    fi
+    
+    # Check if Containerfile is newer than the image
+    # Get Containerfile modification time (Unix timestamp)
+    local containerfile_mtime
+    containerfile_mtime=$(stat -c %Y "${SCRIPT_DIR}/Containerfile" 2>/dev/null)
+    
+    if [ -z "$containerfile_mtime" ]; then
+        echo "Cannot determine Containerfile modification time. Rebuilding..."
+        podman build -t "${IMAGE_NAME}" -f "${SCRIPT_DIR}/Containerfile" "${SCRIPT_DIR}"
+        return
+    fi
+    
+    # Get image creation time as Unix timestamp directly
+    local image_unix_timestamp
+    image_unix_timestamp=$(podman image inspect "${IMAGE_NAME}" --format '{{.Created.Unix}}' 2>/dev/null)
+    
+    if [ -z "$image_unix_timestamp" ]; then
+        echo "Cannot determine image creation time. Rebuilding..."
+        podman build -t "${IMAGE_NAME}" -f "${SCRIPT_DIR}/Containerfile" "${SCRIPT_DIR}"
+        return
+    fi
+    
+    if [ "$containerfile_mtime" -gt "$image_unix_timestamp" ]; then
+        echo "Containerfile is newer than image. Rebuilding..."
+        podman build -t "${IMAGE_NAME}" -f "${SCRIPT_DIR}/Containerfile" "${SCRIPT_DIR}"
+    else
+        echo "Using existing image: ${IMAGE_NAME} (Containerfile unchanged)"
     fi
 }
 
