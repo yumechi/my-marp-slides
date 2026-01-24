@@ -4,12 +4,12 @@ theme: custom-gaia
 paginate: true
 ---
 
-# Pycon mini Shizuoka 2026 ご紹介
+# PyCon mini Shizuoka 2026 ご紹介
 ## 2026/01/24 Python駿河 勉強会
 
 ---
 
-## Python mini Shizuoka 2026 開催します！
+## PyCon mini Shizuoka 2026 開催します！
 
 - 申込みは Connpass から
     - https://pycon-shizu.connpass.com/event/372943/
@@ -42,7 +42,7 @@ paginate: true
 
 - https://shizuoka.pycon.jp/2026/info
 - キーノートは aodag さん
-    - 豊富な Python 経験があり、過去には Python mini 東海 でもキーノートをしています
+    - 豊富な Python 経験があり、過去には PyCon mini 東海 でもキーノートをしています
 - トークは企業での実践的な活用や、個人向けのもの、最近のLLMの活用、コミュニティ向けのものと多岐にわたります
     - 一つでも興味があれば是非参加してください！
 
@@ -74,7 +74,7 @@ paginate: true
 
 ## さいごに
 
-- 以上、Pycon mini Shizuoka 2026 ご紹介でした
+- 以上、PyCon mini Shizuoka 2026 ご紹介でした
 - 周りの Python を使っている方や、エンジニアをしている方にもぜひお伝えください！
 
 ---
