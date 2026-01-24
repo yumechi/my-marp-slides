@@ -60,3 +60,23 @@ paginate: true
 - ポイント1
 - ポイント2
 ```
+
+## ライセンス
+
+### プロジェクト本体
+
+このプロジェクト（ビルドスクリプト、設定ファイル等）は [MIT License](LICENSE) の下で公開されています。
+
+### 生成されるスライド
+
+生成されるPDFスライドには、以下のライセンスが適用されるコンポーネントが含まれています:
+
+- **フォント**: Noto Sans CJK ([SIL Open Font License 1.1](https://github.com/notofonts/noto-cjk/blob/main/Sans/LICENSE))
+  - 商用・非商用問わず自由に使用可能
+  - ドキュメント（PDF）への埋め込み可能
+  - フォント単体での販売は不可
+
+### 使用技術のライセンス
+
+- **Marp CLI**: [MIT License](https://github.com/marp-team/marp-cli)
+- **Podman**: [Apache License 2.0](https://github.com/containers/podman/blob/main/LICENSE) (ビルドツールとして使用)
