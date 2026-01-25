@@ -2,11 +2,11 @@
 marp: true
 theme: custom-gaia
 paginate: true
-footer: "X: @your_username"
+footer: "X: @__yumechi"
 ---
 
-# プレゼンテーションタイトル
-## あなたの名前
+# プレゼンテーションタイトル（少し長めの文章少し長めの文章少し長めの文章）
+## (2026/01/25 勉強会の名前勉強会の名前) あなたの名前
 
 ---
 

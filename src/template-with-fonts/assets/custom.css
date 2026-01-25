@@ -54,7 +54,15 @@ section footer::after {
   color: #ccc;
 }
 
-/* タイトルスライド（h1 + h2 がある）では footer を非表示 */
+/* タイトルスライド（h1 + h2 がある）では footer を非表示 & 中央配置 */
+section:has(h1):has(h2):not(:has(h3)):not(:has(ul)):not(:has(ol)):not(:has(p)) {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
 section:has(h1):has(h2) footer {
   display: none;
 }
