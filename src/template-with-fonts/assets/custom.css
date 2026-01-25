@@ -32,3 +32,18 @@ section li {
 section code {
   font-family: 'Noto Sans Mono CJK JP', monospace;
 }
+
+/* SNS ID footer - h1 がないページでのみ表示 */
+section footer {
+  position: absolute;
+  left: auto;
+  right: 30px;
+  bottom: 21px;
+  font-size: 0.6em;
+  color: #666;
+}
+
+/* h1 があるページでは footer を非表示 */
+section:has(h1) footer {
+  display: none;
+}

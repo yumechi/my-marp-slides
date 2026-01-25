@@ -2,6 +2,7 @@
 marp: true
 theme: custom-gaia
 paginate: true
+footer: "X: @your_username"
 ---
 
 # プレゼンテーションタイトル
@@ -35,6 +36,8 @@ def hello():
 コードブロックには Noto Sans Mono CJK JP フォントが適用されます。
 
 ---
+
+<!-- _footer: "" -->
 
 ## ライセンス情報
 
