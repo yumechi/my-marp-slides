@@ -34,13 +34,24 @@ section code {
 }
 
 /* SNS ID footer - h1 がないページでのみ表示 */
+/* ページ番号 (section::after) の左横に配置 */
 section footer {
   position: absolute;
   left: auto;
-  right: 30px;
-  bottom: 21px;
-  font-size: 0.6em;
+  right: 70px;
+  bottom: 0;
+  height: 70px;
+  line-height: 50px;
+  padding: 10px 0;
+  font-size: 66%;
   color: #666;
+}
+
+/* ページ番号と footer の間に区切り線を追加 */
+section footer::after {
+  content: " |";
+  margin-left: 0.5em;
+  color: #ccc;
 }
 
 /* h1 があるページでは footer を非表示 */
